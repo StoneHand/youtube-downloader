@@ -7,8 +7,8 @@ from downloader.video import download_video
 class YouTubeDownloaderApp:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Descargador de YouTube")
-        self.root.geometry("500x250")
+        self.root.title("Youtube Downloader")
+        self.root.geometry("500x300")
         self.root.resizable(False, False)
 
         # Campo de entrada para el enlace de YouTube
@@ -44,9 +44,9 @@ class YouTubeDownloaderApp:
         # Selección de calidad para video
         self.quality_label = tk.Label(self.root, text="Calidad de video:", font=("Arial", 10))
         self.quality_label.pack()
-        self.quality_combo = ttk.Combobox(self.root, values=["360p", "720p", "1080p"], state="readonly", width=10)
+        self.quality_combo = ttk.Combobox(self.root, values=["baja", "media", "alta"], state="readonly", width=10)
         self.quality_combo.pack(pady=5)
-        self.quality_combo.set("720p")  # Valor predeterminado
+        self.quality_combo.set("media")  # Valor predeterminado
 
         # Barra de progreso
         self.progress_label = tk.Label(self.root, text="Progreso:", font=("Arial", 10))
@@ -54,38 +54,95 @@ class YouTubeDownloaderApp:
         self.progress_bar = ttk.Progressbar(self.root, orient="horizontal", length=400, mode="determinate")
         self.progress_bar.pack(pady=10)
 
+        # Etiqueta para mostrar estado
+        self.status_label = tk.Label(self.root, text="", font=("Arial", 10))
+        self.status_label.pack()
+
+    def fetch_title(self, youtube_url):
+        """
+        Obtiene el título del video de YouTube sin descargarlo.
+        """
+        from yt_dlp import YoutubeDL
+        try:
+            with YoutubeDL({'quiet': True}) as ydl:
+                info = ydl.extract_info(youtube_url, download=False)
+                return info.get('title', 'Video desconocido')
+        except Exception as e:
+            return None
+
+    def show_confirmation(self, title, action):
+        """
+        Muestra un popup de confirmación antes de proceder con la descarga.
+        """
+        return messagebox.askyesno(
+            "Confirmación",
+            f"¿Deseas descargar el {action} con el nombre:\n\n'{title}'?"
+        )
+
     def handle_audio_download(self):
         youtube_url = self.link_entry.get()
         if not youtube_url:
             self.show_message("Por favor, ingresa un enlace de YouTube.")
             return
+
+        title = self.fetch_title(youtube_url)
+        if not title:
+            self.show_message("Error al obtener el título del video.")
+            return
+
+        if not self.show_confirmation(title, "audio"):
+            return
+
         try:
-            self.progress_bar.start()
-            download_audio(youtube_url)
-            self.progress_bar.stop()
+            self.progress_bar["value"] = 0
+            self.status_label.config(text="Descargando audio...")
+            download_audio(youtube_url, self.progress_hook)
             self.show_message("Audio descargado exitosamente.")
         except Exception as e:
-            self.progress_bar.stop()
             self.show_message(f"Error al descargar audio: {e}")
+        finally:
+            self.progress_bar["value"] = 0
+            self.status_label.config(text="")
 
     def handle_video_download(self):
         youtube_url = self.link_entry.get()
         if not youtube_url:
             self.show_message("Por favor, ingresa un enlace de YouTube.")
             return
+
+        title = self.fetch_title(youtube_url)
+        if not title:
+            self.show_message("Error al obtener el título del video.")
+            return
+
+        if not self.show_confirmation(title, "video"):
+            return
+
         quality = self.quality_combo.get()
         try:
-            self.progress_bar.start()
-            download_video(youtube_url, quality)
-            self.progress_bar.stop()
+            self.progress_bar["value"] = 0
+            self.status_label.config(text="Descargando video...")
+            download_video(youtube_url, quality, self.progress_hook)
             self.show_message("Video descargado exitosamente.")
         except Exception as e:
-            self.progress_bar.stop()
             self.show_message(f"Error al descargar video: {e}")
+        finally:
+            self.progress_bar["value"] = 0
+            self.status_label.config(text="")
+
+    def progress_hook(self, d):
+        if d['status'] == 'downloading':
+            downloaded_bytes = d.get('downloaded_bytes', 0)
+            total_bytes = d.get('total_bytes', d.get('total_bytes_estimate', 0))
+            if total_bytes > 0:
+                progress = int(downloaded_bytes / total_bytes * 100)
+                self.progress_bar["value"] = progress
+                self.status_label.config(text=f"Progreso: {progress}%")
+                self.root.update_idletasks()
 
     def show_message(self, message):
         # Ventana emergente con un mensaje
-        tk.messagebox.showinfo("Información", message)
+        messagebox.showinfo("Información", message)
 
     def run(self):
         self.root.mainloop()
