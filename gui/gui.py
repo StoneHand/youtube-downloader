@@ -8,16 +8,30 @@ class YouTubeDownloaderApp:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Youtube Downloader")
-        self.root.geometry("500x300")
+        self.root.geometry("600x200")
         self.root.resizable(False, False)
 
-        # Campo de entrada para el enlace de YouTube
-        self.link_label = tk.Label(self.root, text="Link de YouTube:", font=("Arial", 12))
-        self.link_label.pack(pady=10)
-        self.link_entry = tk.Entry(self.root, width=60, font=("Arial", 10))
-        self.link_entry.pack(pady=5)
+        # Frame para el campo de entrada y el botón "Pegar"
+        self.link_frame = tk.Frame(self.root)
+        self.link_frame.pack(pady=10)
 
-        # Frame para botones
+        # Campo de entrada para el enlace de YouTube
+        self.link_label = tk.Label(self.link_frame, text="Link de YouTube:", font=("Arial", 12))
+        self.link_label.pack(side=tk.LEFT, padx=5)
+        self.link_entry = tk.Entry(self.link_frame, width=50, font=("Arial", 10))
+        self.link_entry.pack(side=tk.LEFT, padx=5)
+
+        # Botón "Pegar"
+        self.paste_button = tk.Button(
+            self.link_frame,
+            text="Pegar",
+            font=("Arial", 10),
+            bg="yellow",
+            command=self.paste_link
+        )
+        self.paste_button.pack(side=tk.LEFT, padx=5)
+
+        # Frame para botones y seleccion de calidad
         self.buttons_frame = tk.Frame(self.root)
         self.buttons_frame.pack(pady=20)
 
@@ -42,10 +56,10 @@ class YouTubeDownloaderApp:
         self.video_button.grid(row=0, column=1, padx=10)
 
         # Selección de calidad para video
-        self.quality_label = tk.Label(self.root, text="Calidad de video:", font=("Arial", 10))
-        self.quality_label.pack()
-        self.quality_combo = ttk.Combobox(self.root, values=["baja", "media", "alta"], state="readonly", width=10)
-        self.quality_combo.pack(pady=5)
+        self.quality_label = tk.Label(self.buttons_frame, text="Calidad:", font=("Arial", 10))
+        self.quality_label.grid(row=0, column=2, padx=5)
+        self.quality_combo = ttk.Combobox(self.buttons_frame, values=["baja", "media", "alta"], state="readonly", width=10)
+        self.quality_combo.grid(row=0, column=3, padx=5)
         self.quality_combo.set("media")  # Valor predeterminado
 
         # Barra de progreso
@@ -78,6 +92,17 @@ class YouTubeDownloaderApp:
             "Confirmación",
             f"¿Deseas descargar el {action} con el nombre:\n\n'{title}'?"
         )
+    
+    def paste_link(self):
+        """
+        Pega el contenido del portapapeles en el cuadro de entrada del enlace.
+        """
+        try:
+            clipboard_content = self.root.clipboard_get()
+            self.link_entry.delete(0, tk.END)
+            self.link_entry.insert(0, clipboard_content)
+        except Exception as e:
+            self.show_message("No se pudo pegar el enlace del portapapeles.")
 
     def handle_audio_download(self):
         youtube_url = self.link_entry.get()
