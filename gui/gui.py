@@ -26,7 +26,7 @@ class YouTubeDownloaderApp:
             self.link_frame,
             text="Pegar",
             font=("Arial", 10),
-            bg="yellow",
+            bg="orange",
             command=self.paste_link
         )
         self.paste_button.pack(side=tk.LEFT, padx=5)
