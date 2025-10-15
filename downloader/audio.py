@@ -17,6 +17,7 @@ def download_audio(youtube_url, progress_callback=None):
         'format': 'bestaudio',  # Descarga solo el mejor audio disponible
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s',  # Plantilla de salida
         'progress_hooks': [progress_callback] if progress_callback else [],  # Callback de progreso
+        'noplaylist': True, # No descargar la lista de reproducción
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',  # Usa FFmpeg para extraer solo el audio
             'preferredcodec': 'mp3',  # Codificación MP3

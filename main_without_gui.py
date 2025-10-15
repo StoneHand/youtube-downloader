@@ -10,9 +10,18 @@ def main():
         if choice == '1':
             download_audio(youtube_url)
         elif choice == '2':
-            quality = input("Selecciona la calidad del video (360p, 720p, 1080p): ")
-            if quality not in ['360p', '720p', '1080p']:
+            quality = input("Selecciona el número para la calidad del video (baja=1, media=2, alta=3): ")
+            if quality not in ['1', '2', '3']:
                 print("Calidad no válida. Usando 720p por defecto.")
+                quality = '720p'
+            elif quality == '1':
+                print("Seleccionaste baja calidad (360p).")
+                quality = '360p'
+            elif quality == '3':
+                print("Seleccionaste alta calidad (1080p).")
+                quality = '1080p'
+            else:
+                print("Seleccionaste calidad media (720p).")
                 quality = '720p'
             download_video(youtube_url, quality=quality)
         else:

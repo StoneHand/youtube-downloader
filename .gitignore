@@ -1,2 +1,38 @@
+# Carpetas de salida para las descargas
 video/
 audio/
+
+# Entornos virtuales
+venv/
+env/
+*.venv
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de distribución/instalación
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Archivos de configuración del IDE
+.vscode/
+.idea/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de entorno
+.env
+*.env
+
+# Archivos de testing
+.pytest_cache/
+.coverage
+htmlcov/

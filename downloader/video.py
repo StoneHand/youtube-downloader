@@ -26,6 +26,7 @@ def download_video(youtube_url, quality="media", progress_callback=None):
         'outtmpl': f'{output_folder}/%(title)s.%(ext)s',  # Plantilla de salida
         'merge_output_format': 'mp4',  # Formato final
         'progress_hooks': [progress_callback] if progress_callback else [],  # Callback de progreso
+        'noplaylist': True, # No descargar la lista de reproducción
     }
 
     # Descarga el video usando yt_dlp
