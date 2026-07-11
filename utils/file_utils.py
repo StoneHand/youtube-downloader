@@ -1,14 +1,27 @@
 import os
+from pathlib import Path
+
 
 def get_download_folder(subfolder=""):
     """
     Obtiene la carpeta de descargas del usuario y opcionalmente agrega un subdirectorio.
-    :param subfolder: Subcarpeta dentro de Downloads (por ejemplo, "audio" o "video").
-    :return: Ruta completa de la carpeta.
+    Compatible con Windows, Linux y macOS.
     """
-    downloads_path = os.path.join(os.environ['USERPROFILE'], 'Downloads')
+    downloads_path = _get_downloads_path()
     if subfolder:
-        folder_path = os.path.join(downloads_path, subfolder)
-        os.makedirs(folder_path, exist_ok=True)  # Crear la carpeta si no existe
-        return folder_path
-    return downloads_path
+        folder_path = downloads_path / subfolder
+        folder_path.mkdir(parents=True, exist_ok=True)
+        return str(folder_path)
+    return str(downloads_path)
+
+
+def _get_downloads_path():
+    if os.name == "nt":
+        base = Path(os.environ.get("USERPROFILE", Path.home()))
+        return base / "Downloads"
+
+    xdg_download = os.environ.get("XDG_DOWNLOAD_DIR")
+    if xdg_download:
+        return Path(xdg_download)
+
+    return Path.home() / "Downloads"

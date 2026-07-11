@@ -1,13 +1,12 @@
 from gui.gui import YouTubeDownloaderApp
+from utils.environment import print_environment_status
 from utils.update_checker import check_and_update_yt_dlp
 
-def main():
-    # Verificar y actualizar yt-dlp antes de ejecutar el programa
-    check_and_update_yt_dlp()
 
-    # Continuar con la lógica principal del programa
+def main():
+    check_and_update_yt_dlp()
+    print_environment_status()
     print("Iniciando el descargador de YouTube...")
-    # Ejecutar gui
     app = YouTubeDownloaderApp()
     app.run()
 
