@@ -27,23 +27,20 @@ def _apply_cookie_options(opts):
 def get_base_ydl_opts():
     """
     Devuelve opciones base compatibles con YouTube en 2025+.
-    Incluye reintentos, runtime JS y clientes alternativos.
+    Incluye reintentos y runtime JS. Los clientes de YouTube se dejan en el valor por
+    defecto de yt-dlp: forzar "android" dejaba solo 1 formato disponible.
     """
     opts = {
         "noplaylist": True,
         "retries": 10,
         "fragment_retries": 10,
         "ignoreerrors": False,
-        "extractor_args": {
-            "youtube": {
-                "player_client": ["android", "web"],
-            }
-        },
     }
 
     runtime, path = _find_js_runtime()
-    if runtime:
-        opts["js_runtimes"] = {runtime: path} if path else [runtime]
+    if runtime and path:
+        # yt-dlp espera {runtime: {config}}; "path" es la ruta al ejecutable.
+        opts["js_runtimes"] = {runtime: {"path": path}}
 
     _apply_cookie_options(opts)
     return opts

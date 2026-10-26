@@ -3,7 +3,7 @@ setlocal EnableExtensions
 
 set "TARGET_DIR=D:\Dev"
 set "REPO_DIR=%TARGET_DIR%\youtube-downloader"
-set "BRANCH=cursor/fix-youtube-downloader-4ddd"
+set "BRANCH=main"
 set "REPO_URL=https://github.com/StoneHand/youtube-downloader.git"
 
 echo ============================================
