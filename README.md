@@ -4,7 +4,7 @@ Aplicación de escritorio, hecha en Python con Tkinter, para descargar videos (M
 
 ## Características
 
-- **Descarga de video** en MP4 con tres calidades: baja (360p), media (720p, por defecto) y alta (1080p). Si el video no tiene la calidad pedida, se usa la más cercana disponible.
+- **Descarga de video** en MP4 con tres calidades: baja (360p), media (720p, por defecto) y alta (1080p). Si el video no tiene la calidad pedida, se usa la más cercana disponible. Se prefiere H.264 + AAC para que el archivo se reproduzca en Windows sin códecs adicionales; si un video no ofrece AAC, el audio se convierte automáticamente.
 - **Descarga de audio** en MP3 a 128 kbps.
 - Interfaz con letra y botones grandes, botón **Pegar** y barra de progreso.
 - Confirmación con el título del video antes de descargar.
