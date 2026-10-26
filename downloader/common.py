@@ -31,6 +31,22 @@ def _apply_cookie_options(opts):
         opts["cookiesfrombrowser"] = (cookies_browser.strip(),)
 
 
+class _ConsoleLogger:
+    """
+    Logger de yt-dlp sin ruido: los errores se muestran en la ventana (en español), así que
+    no se repiten en la consola. Solo se dejan las advertencias.
+    """
+
+    def debug(self, message):
+        pass
+
+    def warning(self, message):
+        print(f"Advertencia: {message}")
+
+    def error(self, message):
+        pass
+
+
 COOKIE_ERROR = re.compile(r"cookie|secretstorage|keyring|dpapi|decrypt", re.IGNORECASE)
 BOT_CHECK_ERROR = re.compile(r"sign in to confirm|not a bot", re.IGNORECASE)
 
@@ -51,7 +67,7 @@ def run_with_cookie_fallback(operation):
             and not BOT_CHECK_ERROR.search(message)
         ):
             raise
-        print(f"No se pudieron leer las cookies ({error}). Reintentando sin cookies...")
+        print("No se pudieron leer las cookies del navegador. Continuando sin cookies.")
         return operation(False)
 
 
@@ -66,6 +82,7 @@ def get_base_ydl_opts(use_cookies=True):
         "retries": 10,
         "fragment_retries": 10,
         "ignoreerrors": False,
+        "logger": _ConsoleLogger(),
     }
 
     runtime, path = _find_js_runtime()
