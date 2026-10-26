@@ -111,16 +111,19 @@ Pide el enlace por consola y permite elegir audio o video, con calidad baja (1),
 | "No hay conexión a internet" | Revisar la conexión y reintentar. |
 | "Falta un programa necesario (FFmpeg)" | Instalar FFmpeg y confirmar que `ffmpeg -version` funciona en una terminal nueva. |
 | "YouTube pidió verificar que eres una persona" | Reintentar más tarde o usar cookies (ver abajo). |
+| "No se pudo leer la información de tu navegador" / `Could not copy Chrome cookie database` | Hay una variable `YTDLP_COOKIES_BROWSER` configurada y el navegador no deja leer sus cookies. La app ya reintenta sin cookies; si igual falla, cierra el navegador por completo o elimina la variable (ver abajo). |
 | "Este video no está disponible" / "es privado" | El video fue borrado, es privado o está bloqueado en tu país. |
 | "El enlace no parece ser de un video de YouTube" | Copiar el enlace completo desde la barra de direcciones o con "Compartir". |
 | Se ve pequeña o no se ve la ventana | Los tamaños están en `gui/gui.py` (`FONT` y `FONT_BOLD`). |
 
 ### Cookies (cuando YouTube pide verificación)
 
-Define una de estas variables de entorno antes de ejecutar la aplicación:
+Las cookies son **opcionales**: solo se usan si defines una de estas variables de entorno antes de ejecutar la aplicación. Si las cookies del navegador no se pueden leer, la app reintenta automáticamente sin ellas.
 
-- `YTDLP_COOKIES_BROWSER`: navegador desde el que leer las cookies (`chrome`, `firefox`, `edge`, ...).
+- `YTDLP_COOKIES_BROWSER`: navegador desde el que leer las cookies (`firefox`, `edge`, `chrome`, ...).
 - `YTDLP_COOKIES_FILE`: ruta a un archivo de cookies exportado.
+
+> En Windows, Chrome (y otros navegadores basados en Chromium) bloquean la lectura de sus cookies mientras están abiertos y, en versiones recientes, las cifran de forma que yt-dlp no puede leerlas. Para esos casos es más fiable Firefox o un archivo de cookies exportado.
 
 ```bash
 # Linux / macOS
@@ -128,10 +131,19 @@ YTDLP_COOKIES_BROWSER=firefox python main.py
 ```
 
 ```bat
-:: Windows
-set YTDLP_COOKIES_BROWSER=chrome
+:: Windows (solo para esta ventana de consola)
+set YTDLP_COOKIES_BROWSER=firefox
 python main.py
 ```
+
+**Quitar la variable si quedó configurada de forma permanente en Windows** (por ejemplo con `setx`):
+
+```bat
+echo %YTDLP_COOKIES_BROWSER%
+reg delete HKCU\Environment /v YTDLP_COOKIES_BROWSER /f
+```
+
+Después cierra y vuelve a abrir la consola.
 
 ## Actualizar el proyecto
 

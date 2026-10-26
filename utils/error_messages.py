@@ -16,6 +16,12 @@ KNOWN_ERRORS = [
         "Pide ayuda para instalarlo.",
     ),
     (
+        ("cookie database", "cookies database", "decrypt", "secretstorage", "keyring",
+         "failed to load cookies"),
+        "No se pudo leer la información de tu navegador.\n\n"
+        "Cierra Chrome por completo y vuelve a intentar, o pide ayuda.",
+    ),
+    (
         ("sign in to confirm", "not a bot", "cookies"),
         "YouTube pidió verificar que eres una persona y no dejó descargar este video.\n\n"
         "Intenta de nuevo más tarde o pide ayuda.",

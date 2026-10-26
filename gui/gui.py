@@ -4,7 +4,7 @@ from tkinter import messagebox
 from tkinter import ttk
 
 from downloader.audio import download_audio
-from downloader.common import get_base_ydl_opts
+from downloader.common import get_base_ydl_opts, run_with_cookie_fallback
 from downloader.video import download_video
 from utils.error_messages import friendly_error
 from utils.url_utils import normalize_youtube_url
@@ -108,10 +108,13 @@ class YouTubeDownloaderApp:
 
     def fetch_title(self, youtube_url):
         """Obtiene el título del video sin descargarlo. Devuelve (título, error)."""
-        try:
-            with YoutubeDL({**get_base_ydl_opts(), "quiet": True}) as ydl:
+        def fetch(use_cookies):
+            with YoutubeDL({**get_base_ydl_opts(use_cookies), "quiet": True}) as ydl:
                 info = ydl.extract_info(youtube_url, download=False)
-                return info.get("title", "Video desconocido"), None
+                return info.get("title", "Video desconocido")
+
+        try:
+            return run_with_cookie_fallback(fetch), None
         except Exception as error:
             print(f"Error al obtener el título: {error}")
             return None, error

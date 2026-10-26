@@ -84,7 +84,7 @@ echo   cd /d %REPO_DIR%
 echo   python main.py
 echo.
 echo Si YouTube pide verificacion:
-echo   set YTDLP_COOKIES_BROWSER=chrome
+echo   set YTDLP_COOKIES_BROWSER=firefox
 echo   python main.py
 echo.
 

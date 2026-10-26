@@ -1,6 +1,7 @@
 """Opciones compartidas de yt-dlp para descargas actuales de YouTube."""
 
 import os
+import re
 import shutil
 
 
@@ -11,6 +12,12 @@ def _find_js_runtime():
         if path:
             return runtime, path
     return None, None
+
+
+def _cookies_configured():
+    opts = {}
+    _apply_cookie_options(opts)
+    return bool(opts)
 
 
 def _apply_cookie_options(opts):
@@ -24,7 +31,31 @@ def _apply_cookie_options(opts):
         opts["cookiesfrombrowser"] = (cookies_browser.strip(),)
 
 
-def get_base_ydl_opts():
+COOKIE_ERROR = re.compile(r"cookie|secretstorage|keyring|dpapi|decrypt", re.IGNORECASE)
+BOT_CHECK_ERROR = re.compile(r"sign in to confirm|not a bot", re.IGNORECASE)
+
+
+def run_with_cookie_fallback(operation):
+    """
+    Ejecuta operation(use_cookies). Si las cookies del navegador no se pueden leer
+    (por ejemplo Chrome abierto en Windows), reintenta sin cookies.
+    """
+    try:
+        return operation(True)
+    except Exception as error:
+        message = str(error)
+        # La verificación anti-bot también nombra las cookies, pero reintentar sin ellas no la arregla.
+        if not (
+            _cookies_configured()
+            and COOKIE_ERROR.search(message)
+            and not BOT_CHECK_ERROR.search(message)
+        ):
+            raise
+        print(f"No se pudieron leer las cookies ({error}). Reintentando sin cookies...")
+        return operation(False)
+
+
+def get_base_ydl_opts(use_cookies=True):
     """
     Devuelve opciones base compatibles con YouTube en 2025+.
     Incluye reintentos y runtime JS. Los clientes de YouTube se dejan en el valor por
@@ -42,5 +73,6 @@ def get_base_ydl_opts():
         # yt-dlp espera {runtime: {config}}; "path" es la ruta al ejecutable.
         opts["js_runtimes"] = {runtime: {"path": path}}
 
-    _apply_cookie_options(opts)
+    if use_cookies:
+        _apply_cookie_options(opts)
     return opts

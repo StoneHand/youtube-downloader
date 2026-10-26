@@ -1,6 +1,6 @@
 from yt_dlp import YoutubeDL
 
-from downloader.common import get_base_ydl_opts
+from downloader.common import get_base_ydl_opts, run_with_cookie_fallback
 from utils.file_utils import get_download_folder
 
 QUALITY_MAP = {
@@ -24,18 +24,22 @@ def download_video(youtube_url, quality="media", progress_callback=None):
     """
     output_folder = get_download_folder("video")
 
-    ydl_opts = {
-        **get_base_ydl_opts(),
-        "format": QUALITY_MAP.get(quality, QUALITY_MAP["media"]),
-        "outtmpl": f"{output_folder}/%(title)s.%(ext)s",
-        "merge_output_format": "mp4",
-        "progress_hooks": [progress_callback] if progress_callback else [],
-    }
+    def run(use_cookies):
+        ydl_opts = {
+            **get_base_ydl_opts(use_cookies),
+            "format": QUALITY_MAP.get(quality, QUALITY_MAP["media"]),
+            "outtmpl": f"{output_folder}/%(title)s.%(ext)s",
+            "merge_output_format": "mp4",
+            "progress_hooks": [progress_callback] if progress_callback else [],
+        }
 
-    with YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(youtube_url, download=False)
-        title = info_dict.get("title", "video")
-        ydl.download([youtube_url])
+        with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(youtube_url, download=False)
+            title = info_dict.get("title", "video")
+            ydl.download([youtube_url])
+        return title
+
+    title = run_with_cookie_fallback(run)
 
     print(f"Video descargado exitosamente: {title}")
     return title
